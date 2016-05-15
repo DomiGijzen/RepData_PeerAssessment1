@@ -1,23 +1,35 @@
----
-title: 'Reproducible Research: Peer Assessment 1'
-author: "Dominique Gijzen"
-date: "15 mei 2016"
-output:
-  word_document: default
-  pdf_document: default
-  html_document:
-    keep_md: yes
----
+# Reproducible Research: Peer Assessment 1
+Dominique Gijzen  
+15 mei 2016  
 ***
 ## Used packages
-```{r echo=TRUE}
+
+```r
 library("dplyr")
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
 ```
 
 ## Loading and preprocessing the data
 A primary check to verify the "activity.csv" file exists and, when not, reading the csv 
 file into a dataframe named "activity".
-```{r echo=TRUE} 
+
+```r
 if (!file.exists("activity.csv"))
       unzip("activity.zip")
 activity <- read.csv("activity.csv")
@@ -25,10 +37,45 @@ activity <- read.csv("activity.csv")
 
 ### First data exploration
 The head, summary and structure of the dataframe are shown.
-```{r echo=TRUE}
+
+```r
 head(activity)
+```
+
+```
+##   steps       date interval
+## 1    NA 2012-10-01        0
+## 2    NA 2012-10-01        5
+## 3    NA 2012-10-01       10
+## 4    NA 2012-10-01       15
+## 5    NA 2012-10-01       20
+## 6    NA 2012-10-01       25
+```
+
+```r
 summary(activity)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
+```
+
+```r
 str(activity)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 * The 'steps' value has a lot of NA's. There are also zero (0) values. So it doesn't sound
@@ -43,10 +90,32 @@ the assessment doesn't use this value as a time value.
 
 ### Preprocessing the data
 The 'date' value is transformed to a real date value.
-```{r echte=TRUE}
+
+```r
 activity$date <- as.Date(activity$date, format = "%Y-%m-%d")
 summary(activity)
+```
+
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 12.00   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304
+```
+
+```r
 str(activity)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 
 ***
@@ -55,21 +124,42 @@ str(activity)
 
 ###Create totals per day
 
-```{r echo=TRUE}
+
+```r
 activity_day <- group_by(activity, date)
 steps_day <- summarise(activity_day, sum(steps))
 ```
 
 ###Show histogram with totals
-```{r echo=TRUE}
+
+```r
 hist(steps_day$`sum(steps)`)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-6-1.png)<!-- -->
+
+```r
 hist(steps_day$`sum(steps)`, breaks=15)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-6-2.png)<!-- -->
+
 ###Calculate and report the mean and median of the total number of steps taken per day
-```{r echo=TRUE}
+
+```r
 mean(steps_day$`sum(steps)`, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(steps_day$`sum(steps)`, na.rm = TRUE)
+```
+
+```
+## [1] 10765
 ```
 
 ***
@@ -78,16 +168,24 @@ median(steps_day$`sum(steps)`, na.rm = TRUE)
 
 ### Time series plot
 
-```{r echo=TRUE}
+
+```r
 activity_interval <- group_by(activity, interval)
 steps_interval <- summarise(activity_interval, mean(steps, na.rm = TRUE))
 plot( steps_interval$interval, steps_interval$`mean(steps, na.rm = TRUE)`, type = "l")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
+
 ### 5 Minute interval with max steps
 
-```{r echo=TRUE}
+
+```r
 steps_interval$interval[steps_interval$`mean(steps, na.rm = TRUE)`==max(steps_interval$`mean(steps, na.rm = TRUE)`)]
+```
+
+```
+## [1] 835
 ```
 
 ***
@@ -96,8 +194,13 @@ steps_interval$interval[steps_interval$`mean(steps, na.rm = TRUE)`==max(steps_in
 
 ### Number of rows with missing values(steps)
 
-```{r echo=TRUE}
+
+```r
 nrow(activity[is.na(activity$steps),])
+```
+
+```
+## [1] 2304
 ```
 
 ### Strategy to impute missing values
@@ -105,9 +208,21 @@ nrow(activity[is.na(activity$steps),])
 To think about a startegy to impute the missing values, we need to have more 
 information about the NA's. In particular the locations of the NA's.
 
-```{r echo=TRUE}
+
+```r
 activity_na <- activity[is.na(activity$steps),]
 summary(activity_na)
+```
+
+```
+##      steps           date               interval     
+##  Min.   : NA    Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.: NA    1st Qu.:2012-10-26   1st Qu.: 588.8  
+##  Median : NA    Median :2012-11-06   Median :1177.5  
+##  Mean   :NaN    Mean   :2012-11-01   Mean   :1177.5  
+##  3rd Qu.: NA    3rd Qu.:2012-11-11   3rd Qu.:1766.2  
+##  Max.   : NA    Max.   :2012-11-30   Max.   :2355.0  
+##  NA's   :2304
 ```
 
 Based on this quick analysis, it seems that the missing NA are in fact missing 
@@ -116,30 +231,62 @@ and use that to impute the NA's. An alternative is to impute with the column mea
 
 ### Impute NA's with column mean
 
-```{r echo=TRUE}
+
+```r
 activity_imputed <- activity
 activity_imputed$steps[is.na(activity_imputed$steps)] <- mean(activity$steps, na.rm = TRUE)
 summary(activity_imputed)
 ```
 
+```
+##      steps             date               interval     
+##  Min.   :  0.00   Min.   :2012-10-01   Min.   :   0.0  
+##  1st Qu.:  0.00   1st Qu.:2012-10-16   1st Qu.: 588.8  
+##  Median :  0.00   Median :2012-10-31   Median :1177.5  
+##  Mean   : 37.38   Mean   :2012-10-31   Mean   :1177.5  
+##  3rd Qu.: 37.38   3rd Qu.:2012-11-15   3rd Qu.:1766.2  
+##  Max.   :806.00   Max.   :2012-11-30   Max.   :2355.0
+```
+
 ### Make a new histogram, mean and median
 
 #### Create totals per day
-```{r echo=TRUE}
+
+```r
 activity_imputed_day <- group_by(activity_imputed, date)
 imputed_steps_day <- summarise(activity_imputed_day, sum(steps))
 ```
 
 #### Show histogram with totals
-```{r echo=TRUE}
+
+```r
 hist(imputed_steps_day$`sum(steps)`)
+```
+
+![](PA1_template_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+
+```r
 hist(imputed_steps_day$`sum(steps)`, breaks=15)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-14-2.png)<!-- -->
+
 #### Calculate and report the mean and median of the total number of steps taken per day
-```{r echo=TRUE}
+
+```r
 mean(imputed_steps_day$`sum(steps)`, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(imputed_steps_day$`sum(steps)`, na.rm = TRUE)
+```
+
+```
+## [1] 10766.19
 ```
 
 ##### Do these values differ from the estimates from the first part of the assignment?  
@@ -157,15 +304,25 @@ affected by +1.69.
 
 ### Add weekdays information imputed data
 
-```{r echo+TRUE}
+
+```r
 weekdays1 <- c("maandag", "dinsdag", "woensdag", "donderdag", "vrijdag")
 activity_imputed$day <- factor((weekdays(activity_imputed$date) %in% weekdays1), levels=c(FALSE, TRUE), labels=c('weekend', 'weekdag'))
 str(activity_imputed)
 ```
 
+```
+## 'data.frame':	17568 obs. of  4 variables:
+##  $ steps   : num  37.4 37.4 37.4 37.4 37.4 ...
+##  $ date    : Date, format: "2012-10-01" "2012-10-01" ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
+##  $ day     : Factor w/ 2 levels "weekend","weekdag": 2 2 2 2 2 2 2 2 2 2 ...
+```
+
 ### Time series plot
 
-```{r echo=TRUE}
+
+```r
 activity_imputed_interval <- group_by(activity_imputed, interval, day)
 imputed_steps_interval <- summarise(activity_imputed_interval, mean(steps, na.rm = TRUE))
 imputed_steps_interval_weekdag <- imputed_steps_interval[imputed_steps_interval$day=="weekdag",]
@@ -174,6 +331,8 @@ par(mfrow=c(2,1))
 plot(imputed_steps_interval_weekdag$interval, imputed_steps_interval_weekdag$`mean(steps, na.rm = TRUE)`, type = "l")
 plot(imputed_steps_interval_weekend$interval, imputed_steps_interval_weekend$`mean(steps, na.rm = TRUE)`, type = "l")
 ```
+
+![](PA1_template_files/figure-html/unnamed-chunk-16-1.png)<!-- -->
 
 In this plot, it is clearly indicated that there is a difference between weekdays 
 and weekends. 
